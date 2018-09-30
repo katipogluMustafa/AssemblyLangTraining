@@ -32,6 +32,7 @@ The 2’s complement representation for a non-negative number is, you represent 
 One of the reasons that the 2’s complement representation scheme is commonly used to store signed integers in computers is that addition and subtraction operations for signed integers are identical to the corresponding operations for unsigned integers. This means that the CPU does not need separate circuitry for signed and unsigned addition or subtraction operations.
 
 ![Addition Example 1](img/addition1.jpg)
+
 ![Addition Example 2](img/addition2.jpg)
 
 Each of the last two additions has a carry out of the usual high-order bit position into an extra bit. The remaining bits do not give the correct unsigned result. In fact, carry always indicates that the answer is wrong if the operands are interpreted as unsigned. Although in these examples the remaining bits gave the correct 2’s complement representation, this is not always the case, even for signed numbers. Consider the addition of the following two positive numbers:
@@ -80,7 +81,7 @@ This time there is a carry, but the remaining four hex digits 76EF cannot be the
 
 ![Overflow in Subtraction](img/overflowInSubtraction.png)
 
-
+See [Exercises](Exercises/README.md)
 
 
 
