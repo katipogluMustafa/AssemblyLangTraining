@@ -57,13 +57,37 @@ A practical computer system consists of hardware and software.
   The 8086 through 80286 processors have four 16-bit general registers called AX, BX, CX, and DX. The “E” was added for “extended” with the 32-bit 80386 registers. The 80386 and later architectures effectively include the original 16-bit architecture.
   
   * There are four additional 32-bit registers that Intel also calls general registers: ESI, EDI, ESP, and EBP. In fact, you can use these registers for operations like arithmetic, but normally you should save them for their special purposes.
-   * The ESI and EDI registers are index registers, where SI stands for “source index” and DI stands for “destination index.”
+   * The **ESI** and **EDI** registers are index registers, where SI stands for “source index” and DI stands for “destination index.”
         * One of their uses is to indicate memory addresses of the source and destination when strings of characters are copied from one place to another in memory. 
         * They can also be used to implement array indexes.
         * The names SI and DI can be used for the low-order words of ESI and EDI, respectively, but we have no occasion to do this.
-   * The ESP register is the stack pointer for the system stack.
+   * The **ESP** register is the **stack pointer** for the system stack.
         * It is sometimes changed directly by a program, but is more frequently changed automatically when data is pushed onto the stack or popped from the stack.
-        *  The address of the instruction following the procedure call instruction is stored on the stack. When it is time to return, this address is retrieved from the stack.          
+        *  The address of the instruction following the procedure call instruction is stored on the stack. When it is time to return, this address is retrieved from the stack.
+   * The **EBP** register is the **base pointer** register.
+        * Normally the only data item accessed in the stack is the one at the top of the stack. However, the EBP register is often used to mark a fixed point in the stack other than the stack top, so that data near this point can be accessed.
+        * This is especially important with procedure calls      
+   * In addition to the eight general-purpose registers
+   
+        * 32-bit 80x86 CPUs have six 16-bit segment registers: CS, DS, ES, FS, GS, and SS   
+        * In the older 16-bit segmented memory model, the **CS** register contains the segment number of the **code segment**
+            * the area of memory storing instructions currently being executed.
+            * Since a segment is 64 KB long, the length of a program’s collection of instructions is often limited to 64 KB;a longer program requires that the contents of CS be changed while the program is running. 
+        * Similarly, **DS** contains the segment number of the **data segment**, the area of memory storing most data.       
+        * The **SS** register contains the segment number of the **stack segment**, where the stack is maintained. 
+        * The **ES** register contains the segment number of the **extra data segment** that could have multiple uses.  
+        *  The FS and GS registers were added with the 80386, and make possible easy access to two additional data segments.
+        
+ * With the flat 32-bit memory model we use, the segment registers become essentially irrelevant to the programmer.The operating system gives each of CS, DS, ES, and SS values.
+    * Recall that each value is a pointer to a table entry that includes the actual starting address of the segment.
+    * That table also includes the size of your program, so that the operating system can indicate an error if your program accidentally or deliberately attempts to write in another area.            
+ 
+ * The 32-bit instruction pointer, or EIP register, cannot be directly accessed by an assembly language programmer.
+     * The CPU has to fetch instructions to be executed from memory, and EIP keeps track of the address of the next instruction to be fetched.     
+     * An 80x86 CPU actually fetches instructions to be executed later while it is still executing prior instructions, making the assumption (usually correct) that the instructions to be executed next will follow sequentially in memory [**Cache prefetching**]. 
+        * If this assumption turns out to be wrong, for example, if a procedure call is executed, then the CPU throws out the instructions it has stored, sets EIP to contain the address of the procedure, and then fetches its next instruction from the new address.   
+ * In addition to prefetching instructions, an 80x86 CPU actually starts execution of an instruction before it finishes execution of prior instructions. This use of **pipelining** increases effective processor speed.       
+        
 ##  PC Hardware: Input/Output Devices
 
 An assembly language programmer has multiple ways to look at I/O devices. 
