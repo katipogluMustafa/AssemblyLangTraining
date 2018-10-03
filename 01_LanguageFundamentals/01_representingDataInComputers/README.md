@@ -83,5 +83,40 @@ This time there is a carry, but the remaining four hex digits 76EF cannot be the
 
 See [Exercises](Exercises/README.md)
 
+## Other Systems for Representing Numbers
 
+The primary reason for introducing 1’s complement, BCD, and floating point here is to illustrate that there are many alternative representations for numeric data, each valid when used in the correct context.
 
+* To take the negative of the number, each bit is “complemented”—each zero is changed to one and each one is changed to zero. This operation is sometimes referred to as taking the 1’s complement of a number. 
+
+There is a useful connection between taking the 1’s complement and taking the 2’s complement of a binary number. If you take the 1’s complement of a number and then add 1, you get the 2’s complement.
+
+In **binary coded decimal** (**BCD**)schemes, each decimal digit is coded with a string of bits with fixed length, and these strings are pieced together to form the representation.
+
+* One BCD representation of the decimal number 926708 is 1001 0010 0110 0111 0000 1000.
+
+![BCD Bit Pattern](img/BCD.png)
+
+It is not as efficient for a computer to do arithmetic with numbers in a BCD format as with 2’s complement numbers. It is usually very inefficient to do arithmetic on numbers represented using ASCII codes. However, ASCII codes are the only method so far for representing a number that is not an integer. For example, 78.375 can be stored as 37 38 2E 33 37 35. **Floating point** representation systems allow for nonintegers to be represented, or at least closely approximated.
+
+#### How to Convert any number to IEEE single precision floating point number
+* Example to show how to convert 78.375 to floating point number.
+    * Note: If you have negative number the only step that needs to change is that you make the very first bit of your result 1 instead of 0.
+    
+![](img/IEEE-single-precision-floating-point-numbers.png)
+
+## Chapter Summary
+
+All data are represented in a computer using electronic signals. These can be interpreted as patterns of binary digits (bits). These bit patterns can be thought of as binary numbers. Numbers can be written in decimal, hexadecimal, or binary forms.
+
+For representing characters, most microcomputers use ASCII codes. One code is assigned for each character, including nonprintable control characters.
+
+Integer values are represented in a predetermined number of bits. An unsigned integer is simply the number in binary. Signed integers are stored in 2’s complement form; a positive number is stored as a binary number (with at least one leading zero to make the required length), and the pattern for a negative number can be obtained by subtracting the positive form from a 1 followed by as many 0’s as are used in the length. A 2’s complement negative number always has a leading 1 bit. 
+
+Addition and subtraction are easy with 2’s complement numbers. Since the length of a 2’s complement number is limited, there is the possibility of a carry, a borrow, or overflow.
+
+Other formats in which numbers are stored are 1’s complement, binary coded decimal (BCD), and floating point.
+
+1. Some early computer systems used byte sizes different from 8 bits.
+
+2. Some other computer architectures use a word size different from 16 bits.
