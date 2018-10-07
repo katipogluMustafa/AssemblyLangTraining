@@ -31,62 +31,166 @@ A practical computer system consists of hardware and software.
  
  ## PC Hardware: The CPU
  
- The 8086/8088 CPU can execute over 200 different instructions.
+ The 8086/8088 CPU can execute over 200 different instructions.Much of this text is concerned with using these instructions to implement programs so that you **understand machine-level computer capabilities**.
  
  This instruction set has been expanded significantly as the 80x86 processor family has grown.
  
  There are other processor families that execute different instruction sets. However, many have a similar architecture, so that the basic principles you learn about 80x86 CPUs also apply to these systems.
  
- An 80x86 CPU contains **registers**, each an internal storage location that can be accessed much more rapidly than a location in RAM.
+ ### Registers
+ 
+ An 80x86 CPU contains **registers**, each an internal storage location that **can be accessed much more rapidly** than a location in RAM.
  
   * **The application registers** are of most concern to the programmer.
     * These are the basic program execution registers, as well as floating point registers, MMX, and XMM registers in some of the processors.
     * A 32-bit 80x86 CPU (from 80386 on) has 16 basic program execution registers.
     * Typical instructions transfer data between these registers and memory or perform operations on data stored in the registers or in memory. 
     * All of these registers have names, and some of them have special purposes.
-        * The **EAX**, **EBX**, **ECX**, and **EDX** registers are called data registers or general registers.
+        * Data Registers or General Registers.
+            * **EAX**
+            * **EBX**
+            * **ECX**
+            * **EDX**
         * The EAX register is sometimes known as the accumulator because it is the destination for many arithmetic results. An example of an instruction using the EAX register is
           ```asm
           add eax, 158    
           ```
   ![Register Image Numbering](img/registerBitNumbering.png)
+  
   ![](img/separatelyUsingAX.png)
+  
   ![](img/usingAL-AH.png)
+  
   ![](img/note1.png)
   
-  The 8086 through 80286 processors have four 16-bit general registers called AX, BX, CX, and DX. The “E” was added for “extended” with the 32-bit 80386 registers. The 80386 and later architectures effectively include the original 16-bit architecture.
   
-  * There are four additional 32-bit registers that Intel also calls general registers: ESI, EDI, ESP, and EBP. In fact, you can use these registers for operations like arithmetic, but normally you should save them for their special purposes.
-   * The **ESI** and **EDI** registers are index registers, where SI stands for “source index” and DI stands for “destination index.”
-        * One of their uses is to indicate memory addresses of the source and destination when strings of characters are copied from one place to another in memory. 
-        * They can also be used to implement array indexes.
-        * The names SI and DI can be used for the low-order words of ESI and EDI, respectively, but we have no occasion to do this.
+  The 8086 through 80286 processors have four 16-bit general registers called AX, BX, CX, and DX. The “E” was added for “extended” with the 32-bit 80386 registers. The 80386 and later architectures effectively include the original 16-bit architecture.
+
+  * There are four additional 32-bit registers that Intel also calls general registers:
+    * You can use these registers for operations like arithmetic, but normally you should save them for their special purposes.
+    * **ESI** , “Extended Source Index”
+    * **EDI** , "Extended Destination Index"
+    * **ESP** , "Extended Stack Pointer"
+    * **EBP** , "Extended Base Pointer"
+    
+  * The **ESI** and **EDI** registers are index registers, where SI stands for “source index” and DI stands for “destination index.”
+    * One of their uses is to indicate memory addresses of the source and destination when strings of characters are copied from one place to another in memory. 
+    * They can also be used to implement array indexes.
+    * The names SI and DI can be used for the low-order words of ESI and EDI, respectively, but we have no occasion to do this.
    * The **ESP** register is the **stack pointer** for the system stack.
         * It is sometimes changed directly by a program, but is more frequently changed automatically when data is pushed onto the stack or popped from the stack.
         *  The address of the instruction following the procedure call instruction is stored on the stack. When it is time to return, this address is retrieved from the stack.
    * The **EBP** register is the **base pointer** register.
         * Normally the only data item accessed in the stack is the one at the top of the stack. However, the EBP register is often used to mark a fixed point in the stack other than the stack top, so that data near this point can be accessed.
-        * This is especially important with procedure calls      
-   * In addition to the eight general-purpose registers
-   
-        * 32-bit 80x86 CPUs have six 16-bit segment registers: CS, DS, ES, FS, GS, and SS   
-        * In the older 16-bit segmented memory model, the **CS** register contains the segment number of the **code segment**
-            * the area of memory storing instructions currently being executed.
-            * Since a segment is 64 KB long, the length of a program’s collection of instructions is often limited to 64 KB;a longer program requires that the contents of CS be changed while the program is running. 
-        * Similarly, **DS** contains the segment number of the **data segment**, the area of memory storing most data.       
-        * The **SS** register contains the segment number of the **stack segment**, where the stack is maintained. 
-        * The **ES** register contains the segment number of the **extra data segment** that could have multiple uses.  
-        *  The FS and GS registers were added with the 80386, and make possible easy access to two additional data segments.
+        * This is especially important with procedure calls 
+
+#### Segment Registers
+            
+   * In addition to the eight general-purpose registers 32-bit 80x86 CPUs have six 16-bit **segment registers**:
+        * **CS**
+        * **DS**
+        * **ES**
+        * **FS**
+        * **GS**
+        * **SS** 
+ *  In the older 16-bit segmented memory model, the **CS** register contains the segment number of the **code segment** the area of memory storing instructions currently being executed.Since a segment is 64 KB long, the length of a program’s collection of instructions is often limited to 64 KB;a longer program requires that the contents of CS be changed while the program is running. 
+ 
+ * Similarly, **DS** contains the segment number of the **data segment**, the area of memory storing most data.       
+ 
+ * The **SS** register contains the segment number of the **stack segment**, where the stack is maintained. 
+ 
+ * The **ES** register contains the segment number of the **extra data segment** that could have multiple uses.
+ 
+ *  The **FS** and **GS** registers were added with the 80386, and make possible easy access to two additional data segments.
         
  * With the flat 32-bit memory model we use, the segment registers become essentially irrelevant to the programmer.The operating system gives each of CS, DS, ES, and SS values.
     * Recall that each value is a pointer to a table entry that includes the actual starting address of the segment.
     * That table also includes the size of your program, so that the operating system can indicate an error if your program accidentally or deliberately attempts to write in another area.            
  
- * The 32-bit instruction pointer, or EIP register, cannot be directly accessed by an assembly language programmer.
+ * The 32-bit **instruction pointer**, or **EIP** register, cannot be directly accessed by an assembly language programmer.
      * The CPU has to fetch instructions to be executed from memory, and EIP keeps track of the address of the next instruction to be fetched.     
      * An 80x86 CPU actually fetches instructions to be executed later while it is still executing prior instructions, making the assumption (usually correct) that the instructions to be executed next will follow sequentially in memory [**Cache prefetching**]. 
         * If this assumption turns out to be wrong, for example, if a procedure call is executed, then the CPU throws out the instructions it has stored, sets EIP to contain the address of the procedure, and then fetches its next instruction from the new address.   
+ 
  * In addition to prefetching instructions, an 80x86 CPU actually starts execution of an instruction before it finishes execution of prior instructions. This use of **pipelining** increases effective processor speed.       
+ 
+ #### Flags
+ 
+ * The final register is called the **flags register**. The name **EFLAGS** refers to this register, but this mnemonic is not used in instructions.
+    * Some of its 32 bits are used to set some characteristic of the 80x86 processor. 
+    * Other bits, called **status flags**, indicate the outcome of execution of an instruction.
+    
+    ![EFLAGS](img/EFLAGs.png)   
+    * Bit 11 is the **overflow flag (OF)**. It is set to 0 following an addition in which no overflow occurred and to 1 if overflow did occur.
+    * Bit 0, the **carry flag (CF)**, indicates the absence or presence of a carry out from the sign position after an addition.
+    * Bit 7, the **sign flag (SF)**, contains the left bit of the result after some operations. Since the left bit is 0 for a non-negative 2’s complement number and 1 for a negative number, SF indicates the sign.
+    * Bit 6, the **zero flag (ZF)**, is set to 1 if the result of an operation is zero, and to 0 if the result is nonzero.
+    * Bit 2, the **parity flag (PF)**, is based only on the low-order 8 bits of a result; it is set to 1 if sum of bits are even, set to 0 if sum of bits are odd.
+ 
+ ##### As an example of how flags are set by instructions
+ 
+ ```asm
+ add eax, 158
+ ```
+ 
+ This instruction affects CF, OF, PF, SF, and ZF.
+ 
+ Suppose that EAX contains the word FF FF FF F3 prior to execution of the instruction. 
+ 
+ Since 158<sub>10</sub> corresponds to the doubleword 00 00 00 9E, this instruction adds FF FF FF F3 and 00 00 00 9E, putting the sum 00 00 00 91 in the EAX register.
+ * It sets the carry flag **CF** to **1** since there is a carry
+ * the overflow flag **OF** to **0** since there is no overflow
+ * the sign flag **SF** to **0** (the leftmost bit of the sum 00 00 00 91)
+ * the zero flag **ZF** to **0** since the sum is not zero.
+ * The parity flag **PF** is set to **0** since 1001 0001 (the low-order byte 91 in binary) contains three 1 bits, an odd number.
+
+#### Summarized ~ The 32-bit 80x86 application registers
+
+![](img/registerSummary.png)
+
+
+ ### 64-bit Registers
+ 
+ In the evolution of the 80x86 family, just as the 32-bit architecture effectively extended the 16-bit architecture, the 64-bit architecture extends the 32-bit architecture. 
+ 
+ * There are sixteen 64-bit general registers. 
+    * The 64-bit register RAX extends the 32-bit register EAX, RBX extends EBX, and so forth. 
+    * However, there are eight new 64-bit general registers named R8, R9, R10, R11, R12, R13, R14, and R15. 
+        * Just as you can refer to the low-order word of EAX as AX in a 32-bit environment, you can refer to the low-order doubleword of RAX as EAX in a 32-bit environment. 
+        * For the new registers R8–R15, you append a D to refer to the low-order doubleword. 
+            * For example, R9D refers to the low-order 32 bits of R9. Similarly, R11W refers to the low-order word (16 bits) of R11, and R15B refers to the low-order byte of R15.
+
+---
+
+  Here is an example of an instruction that is legal in a 64-bit program, but not in a 32-bit program:
+
+
+  
+  ```asm
+  add rax, r12
+  ```
+  
+  This adds the quadword in R12 to the quadword in RAX, replacing the value in RAX.
+ 
+---
+
+ * Recall that in the 32-bit architecture, you can also access bits 8–16 of EAX, EBX, ECX, and EDX using names AH, BH, CH, and DH, respectively. 
+    * These bytes cannot be accessed by name with some 64-bit instructions.
+ 
+ * Index registers ESI and EDI are extended to 64-bit registers RSI and RDI, respectively.
+    * Low-order doublewords can be referenced as ESI and EDI.
+ * ESP and EBP are extended to 64-bit registers RSP and RBP, respectively. 
+ 
+ * Segment registers have not changed in the 64-bit architecture. However, recall that they are essentially unused when the processor is operating in 64-bit mode.
+ 
+ * In the 64-bit environment, the instruction pointer is the 64-bit register RIP.
+ 
+ * The flags are stored in the 64-bit register RFLAGS.
+    * The low-order 32 bits correspond exactly to EFLAGS. Intel documentation says that the high-order 32 bits of RFLAGS are “reserved.”
+
+#### Summarized ~ Basic program execution registers in the 64-bit architecture
+
+![Basic program execution registers in the 64-bit architecture](img/64bitbasicExecutionRegisters.png)        
         
 ##  PC Hardware: Input/Output Devices
 
