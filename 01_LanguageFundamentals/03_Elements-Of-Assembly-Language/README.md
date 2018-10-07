@@ -77,7 +77,7 @@ sum    DWORD   ?
         * The END directive on the last line tells the assembler to stop assembling statements. 
     * The label main on the PROC and END directives names the procedure.    
     * In the console32 environment you must call your procedure main.(We'll discuss later)
-```
+```asm
 .CODE                    ; Start of main program
 main PROC
      mov    eax, number  ; first number to EAX
@@ -88,3 +88,64 @@ main PROC
      ret
 main ENDP
 ```
+---
+
+A **macro** is “shorthand” for a sequence of other statements—instructions, directives, or even other macros.
+
+A statement that is more than just a comment almost always contains a mnemonic that identifies the purpose of the statement, and may have three other fields: name, operand, and comment. 
+
+`name mnemonic operand(s) ; comment`
+
+```asm
+zeroCount: mov ecx, 0 ; initialize count to zero
+```
+
+* The name field ends with a colon (:) when used with an instruction. 
+    * However, when used with a directive, the name field has no colon. 
+
+* The mnemonic in a statement indicates a specific instruction, directive, or macro.
+
+* Some statements have no operand, others have one, others have more. 
+    * If there is more than one, operands are separated by commas; spaces can also be added. 
+    * Sometimes a single operand has components with spaces between them, making it look like more than one operand.
+      
+* One use for the name field is symbolically to reference an instruction’s address in memory. Other instructions can then easily refer to the labeled instruction.
+
+* If the add instruction in the sample program needed to be repeatedly executed in a program loop, then it could be coded 
+```asm
+addLoop: add eax, 158
+```
+
+* The instruction can then be the destination of a jmp (jump) instruction, the assembly language version of a goto:
+    * Notice that the colon does not appear at the end of the name addLoop in the jmp instruction.
+```asm
+jmp addLoop ; repeat addition
+```
+
+* High-level language loop structures like while or for are not available in machine language. However, they can be implemented using jmp or other instructions.
+
+* It is often useful to have a line of source code consisting of just a name, for example    
+
+```asm
+endWhile1:
+```    
+
+* Such a label might mark the end of a while loop.
+    * Such a label might mark the end of a while loop. Technically it references the address of whatever instruction follows the loop, but you don’t have to know what that next statement is to complete coding of the while loop.
+
+---
+
+* Names and other identifiers used in assembly language are formed from letters, digits, and special characters.
+    * The allowable special characters are underscore (_), question mark (?), dollar sign ($), and at sign (@). 
+    
+* A name may not begin with a digit. An identifier may have up to 247 characters, so that it is easy to form meaningful names.
+    *  The assembler does not allow instruction mnemonics, directive mnemonics, register designations, and other words that have a special meaning to the assembler to be used as names.
+
+* **Assembly language statements can be entered using either uppercase or lowercase letters**.            
+    * Normally the assembler does not distinguish between uppercase and lowercase.
+    * It can be instructed to distinguish within identifiers, but this is only needed when you are linking to a program written in a language that is case-sensitive.
+
+* The assembler accepts code that is almost impossible for a person to read.
+    * However, since your programs will also be read by other people, you should make your code as readable as possible. Good program formatting and use of lowercase letters will help.
+
+* Blank lines are allowed in an assembly language source file; they visually separate sections of assembly language code, just like breaking a written narrative into paragraphs.        
