@@ -242,3 +242,25 @@ starsAndSpaces BYTE 24 DUP("* "), '*'
 ; Reserve 100 “undefined” doublewords, each actually containing 00000000
 wordArray DWORD DUP (?)
 ```
+
+* An operand of a BYTE, WORD, DWORD, QWORD, or other statement can be an expression involving arithmetic or other operators. 
+    * These expressions are evaluated by the assembler at assembly time, not at run time, with the resulting value used for assembly.
+    
+```asm
+; The following directives are equivalent
+; each reserving a word with an initial hex value of 00000090.
+gross DWORD 144
+gross DWORD 12*12
+gross DWORD 10 * 15 - 7 + 1
+```
+
+* Although data definition directives are often coded with a label, this is not required. For example, you might code
+     
+    *
+      ```asm
+      value1 DWORD ?
+             DWORD ? 
+      ```
+      
+    * Since there are two DWORD directives, each with a single operand, two doublewords are reserved in the data segment. 
+        * The first can be referenced by value1. The second can be referenced by value1+4 as it is assembled 4 bytes after the first doubleword.
