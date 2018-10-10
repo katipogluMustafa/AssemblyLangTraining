@@ -148,4 +148,97 @@ endWhile1:
 * The assembler accepts code that is almost impossible for a person to read.
     * However, since your programs will also be read by other people, you should make your code as readable as possible. Good program formatting and use of lowercase letters will help.
 
-* Blank lines are allowed in an assembly language source file; they visually separate sections of assembly language code, just like breaking a written narrative into paragraphs.        
+* Blank lines are allowed in an assembly language source file; they visually separate sections of assembly language code, just like breaking a written narrative into paragraphs.
+
+### Data Declarations
+
+Numeric operands can be expressed in decimal, hexadecimal, binary, or octal notations.
+
+The assembler assumes that a number is decimal unless the number has a suffix indicating another base or a .RADIX directive (not used in this text) changes the default number base.
+
+Any of these suffixes can be coded in uppercase or lowercase. The letter Q is easier to read than O on the rare occasions when you might need to code a constant in octal.
+
+![](img/1.png)
+
+A hexadecimal value must start with a digit. You must, for example, code 0a8h instead of a8h to get a constant with value A8<sub>16</sub>. The assembler will interpret a8h as a name.
+
+```asm
+
+byte0 BYTE 7dh
+byte0 BYTE 125
+byte0 BYTE 175q
+byte0 BYTE '{'
+
+```
+
+```asm
+
+byte1 BYTE 255 ; value is FF
+byte2 BYTE 127
+byte3 BYTE -25
+
+```
+
+```asm
+
+double1 DWORD 4294967295 ; FFFFFFFF
+double2 DWORD 0          ; 00000000
+doulbe3 DWORD -1         ; FFFFFFFF
+
+```
+
+```asm
+quad1 QWORD -1           ; FFFFFFFFFFFFFFFF 
+quad2 QWORD 1000         ; 00000000000003E8
+```
+
+* The BYTE directive allows character operands with a single character or string operands with many characters. Either apostrophes (') or quotation marks (") can be used to designate characters or delimit strings. 
+
+```asm
+; Each of the following BYTE directives is allowable.
+
+char1 BYTE 'm'  ; Value is 6d
+char2 BYTE 6dh  ; Value is 6ds
+
+string1 BYTE "Joe"      ; 4A 6F 65
+string2 BYTE "Joe's"    ; 4A 6F 65 27 13
+```
+
+* BYTE, WORD, DWORD, and QWORD directives may have multiple operands separated by commas.
+
+```asm
+
+dwords DWORD 10, 20, 30, 40, 50
+
+string1 BYTE "mustafa"
+string2 BYTE 'm', 'u', 's', 't', 'a', 'f', 'a'
+; string1 and string2 result in the same 7 bytes reserved.
+```
+
+* The DUP operator can be used to generate multiple uninitialized values data fields as well as fields with known values.
+    *  Its use is limited to BYTE, WORD, DWORD, QWORD, and other directives that reserve storage. 
+    
+```asm
+; Reserve 100 double words of storage, each initialized to 000003E7.
+DblArray DWORD 100 DUP(999)
+
+;
+stars BYTE 50 DUP('*')
+```    
+
+```asm
+
+; If one wants 25 asterisks separated by spaces
+starsAndSpaces BYTE 24 DUP("* "), '*' 
+; reserves these 49 bytes and assigns the desired initial values.
+
+```
+
+* To reserve space without assigning any particular initial value, use the operand ?.
+    * This reserves the appropriate number of bytes for the directive.
+    * These bytes are logically undefined; in fact the assembler assigns 00 to each byte.
+
+```asm
+; Reserve 100 “undefined” doublewords, each actually containing 00000000
+wordArray DWORD DUP (?)
+```
