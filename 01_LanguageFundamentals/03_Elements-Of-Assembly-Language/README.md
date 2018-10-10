@@ -264,3 +264,23 @@ gross DWORD 10 * 15 - 7 + 1
       
     * Since there are two DWORD directives, each with a single operand, two doublewords are reserved in the data segment. 
         * The first can be referenced by value1. The second can be referenced by value1+4 as it is assembled 4 bytes after the first doubleword.
+        
+### Instruction Operands        
+
+There are three basic types of instruction operands
+
+1. Constants
+2. CPU register designations
+3. References to memory locations
+
+![](img/2.png)
+![](img/3.png)
+
+* 
+    ```asm
+    00000005 05 0000009E   add   eax, 158   ; add 158
+    ```
+    * The instruction mnemonic is add
+    * the first operand EAX is a register operand 
+    * the second operand 158 is immediate
+    
