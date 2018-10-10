@@ -273,14 +273,56 @@ There are three basic types of instruction operands
 2. CPU register designations
 3. References to memory locations
 
-![](img/2.png)
-![](img/3.png)
+![80x86 addressing modes](img/2.png)
 
-* 
+![80x86 memory addressing modes](img/3.png)
+
+* For an **immediate mode operand**, the data to be used is built into the instruction before it is executed; once there it is constant.
+    * Normally the data is placed in the instruction by the assembler, although it can be inserted by the linker or loader, depending on the stage at which the value can be determined.
+
+* For a **register mode operand**, the data is in a register. To indicate a register mode operand, the programmer simply codes the name of the register. A register mode operand can be coded as a source or as a destination, but an immediate mode operand cannot be a destination.
+
+1. Example 
     ```asm
     00000005 05 0000009E   add   eax, 158   ; add 158
     ```
     * The instruction mnemonic is add
     * the first operand EAX is a register operand 
     * the second operand 158 is immediate
-    
+    * The number 00000005 is the assembly-time address of this instruction.
+        *  The assembler starts assembling instructions at address 00000000, so whatever was assembled before this instruction took 5 bytes.
+    *  This instruction also takes 5 bytes
+        * An opcode 05 (in this case **saying to add a doubleword built into the instruction to EAX**)
+        * The 4 bytes 0000009E of the doubleword representation of 158. 
+    * Collectively, these 5 bytes are called the object code for this instruction.    
+
+2. Example
+    ```asm
+    mov al, '/' ; B0 2F
+    ```
+    * The opcode B0 says to copy the next byte into AL
+    * Byte after the opcode contains the ASCII code 2F for a slash.
+
+* Any **memory mode operand** specifies a source of data in memory, or specifies a destination address in memory.
+
+*  A **direct mode operand** has its 32-bit address built into the instruction.  
+
+* With register indirect mode, the register serves like a pointer variable in a high-level language. 
+    * The register contains the location of the data to be used in the instruction, not the data itself.
+    * When the size of the memory operand is ambiguous, the PTR operator must be used to give the size to the assembler. 
+    * 
+        ```asm
+          mov [ebx], 0 ; ambiguous destination size
+          ; Because it cannot tell whether the destination is a byte, word, doubleword, or quadword.
+        ```
+    * 
+        ```asm
+        mov BYTE PTR [ebx], 0   ; store 00 byte in memory       
+        ```    
+    * For a word, doubleword, or quadword destination, use WORD PTR, DWORD PTR, or QWORD PTR, respectively.
+    * It is not necessary to use DWORD PTR [edx] because the assembler assumes that the source will be a doubleword, the size of the destination EAX. 
+        * 
+            ```asm
+            add eax, [edx]            
+            ```
+            
