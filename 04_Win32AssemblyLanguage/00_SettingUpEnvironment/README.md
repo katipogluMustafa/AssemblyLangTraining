@@ -63,6 +63,12 @@ end
     * Project Properties >> Linker >> Advanced >> Make Image Has Safe Handlers "No"
 
 * stack cookie error
+     ```
+     Unhandled exception at 0x000712B8 in ConsoleApplication3.exe: Stack cookie instrumentation code detected a stack-based buffer overrun.
+     ```
+* Solution 1:
+
     * just make sure your files only have valid breakpoints
         * if it has exclamation mark on the breakpoint, remove the breakpoint.
+        
 
