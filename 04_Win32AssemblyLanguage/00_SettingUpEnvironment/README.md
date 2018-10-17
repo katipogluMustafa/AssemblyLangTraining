@@ -62,4 +62,7 @@ end
     
     * Project Properties >> Linker >> Advanced >> Make Image Has Safe Handlers "No"
 
+* stack cookie error
+    * just make sure your files only have valid breakpoints
+        * if it has exclamation mark on the breakpoint, remove the breakpoint.
 
