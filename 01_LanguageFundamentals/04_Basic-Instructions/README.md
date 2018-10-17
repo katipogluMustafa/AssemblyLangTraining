@@ -56,6 +56,9 @@ mov count, number ; illegal for two memory operands
  
 * mov instructions with byte destination
     ![mov instructions with byte destination](img/1.jpg)
+    
+    Figure 4.1
+    
     * For Instance,
         * ```
           mov   dl, 10   ; object code B2 0A
@@ -79,4 +82,40 @@ mov count, number ; illegal for two memory operands
 
 * next rows of the table have a register destination and a memory source. 
 
-* The accumulator is still the register of choice because the object code is sometimes slightly more compact (takes fewer bytes) when the accumulator is used. AL is the 8-bit accumulator, and because it takes 5 bytes of object code instead of 6 to use the A0 opcode, this is the choice that the assembler makes for destination AL and memory direct source.    
+* The accumulator is still the register of choice because the object code is sometimes slightly more compact (takes fewer bytes) when the accumulator is used. AL is the 8-bit accumulator, and because it takes 5 bytes of object code instead of 6 to use the A0 opcode, this is the choice that the assembler makes for destination AL and memory direct source.
+
+* As an example, suppose that memByte references a byte in memory.
+    * Then the opcode for will be A0.
+        ```asm
+        mov al, memByte
+        ```   
+    * In 32-bit systems, the remaining 4 bytes are the address in memory of memByte.
+    
+    * In 64-bit systems, the remaining 4 bytes are the displacement from RIP to the address of memByte.
+
+* Consider the instruction mov bl, memByte.    
+    * ```asm
+          mov bl, memByte
+      ```
+    * Since BL is not the accumulator
+        * the opcode is 8A 
+        * the number of object code bytes is “2+”
+        * This notation means that there are at least 2 bytes of object code, but the number depends on the mode of the memory operand.
+        * The second byte of object code is a ModR/M byte.Direct memory addressing is always encoded with Mod=00 and R/M=101, while the Reg field encodes the destination 011 (for BL) in this example. This makes the Mod/R/M byte 1D (00 011 101).
+        * The source address for memByte takes 4 additional bytes. With **direct memory mode**, “2+” always means “2+4,” so that the actual number of bytes of object code is 6.
+
+* However, for register indirect mode (the only other 32-bit memory addressing mode we have covered so far), Mod=00, Reg encodes the destination, and R/M encodes the register used as the “pointer.”
+    *  The list shows additional register encodings for 32-bit and 16-bit registers.    
+    
+         ![](img/additionalRegisterEncodingsFor32And16Bit.png)   
+         
+* As an example;
+    ```asm
+    mov al, [ebx]
+    ```        
+    * The accumulator AL is not special except for direct memory addressing, so the opcode will be 8A 
+    * The ModR/M byte will consist of Mod=00 for register indirect memory addressing
+    *  Reg=000 for AL
+    * R/M= 011 for EBX
+    *  making 00 000 011 or 03
+    * In general, for register **indirect mode**, “2+” means “2+0” or just 2.
