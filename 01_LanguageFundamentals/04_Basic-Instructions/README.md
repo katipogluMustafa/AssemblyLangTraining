@@ -64,13 +64,20 @@ mov count, number ; illegal for two memory operands
           mov   dl, 10   ; object code B2 0A
           ```
         *  the instruction has the decimal value 10 stored as the byte-size hex value 0A. The opcode code and immediate value complete the 2 bytes of object code promised in the last column of the table.  
-    * look at the row of the table where the source and destination both say register 8. This row actually stands for mov instructions with 64 possible operand combinations—any of AL, AH, BL, BH, CL, CH, DL, or DH for the source or for the destination. The opcode for any of these possibilities is always 8A, and the second object code byte identifies the registers.
+        ![](img/1.png)
+---
+![](img/2.png) 
+* Look at the row of the table where the source and destination both say register 8. This row actually stands for mov instructions with 64 possible operand combinations—any of AL, AH, BL, BH, CL, CH, DL, or DH for the source or for the destination. The opcode for any of these possibilities is always 8A, and the second object code byte identifies the registers.
     
     * This byte, which Intel documentation refers to as the **ModR/M** byte, has many uses in encoding instructions.
     
-    *  The ModR/M byte always has three fields, the first of which is a 2-bit Mod (“mode”) field in bits 7 and 6. The other two fields are each 3 bits long, and these fields have different meanings in different instructions. However, for instructions with two register operands, Mod=11 and the next field (called Reg for “register”) in bits 5, 4, and 3 encodes the destination, while the final field (called R/M for “register/memory”) in bits 2, 1, and 0 encodes the source register.
+    *  The **ModR/M** byte always has three fields, 
+        * The first of which is a 2-bit Mod (“mode”) field in bits 7 and 6. 
+        * The other two fields are each 3 bits long, and these fields have different meanings in different instructions. 
+            * However, for instructions with two register operands, Mod=11 and the next field (called Reg for “register”) in bits 5, 4, and 3 encodes the destination, 
+            * While the final field (called R/M for “register/memory”) in bits 2, 1, and 0 encodes the source register.
     * The 8-bit register encodings used are shown below
-    * ![](img/2.jpg)
+    ![](img/2.jpg)
     *   
         ```asm
         mov ch, bl ; 8A EB
@@ -78,10 +85,12 @@ mov count, number ; illegal for two memory operands
         * where the ModR/M byte EB is pieced together from 11 101 011; 
         * 11 for register to register
         * 101 for CH
-        * 011 for BL.   
-
-* next rows of the table have a register destination and a memory source. 
-
+        * 011 for BL.  
+         
+---
+![](img/0.png)
+![](img/3.png)
+* Next rows of the table have a register destination and a memory source. 
 * The accumulator is still the register of choice because the object code is sometimes slightly more compact (takes fewer bytes) when the accumulator is used. AL is the 8-bit accumulator, and because it takes 5 bytes of object code instead of 6 to use the A0 opcode, this is the choice that the assembler makes for destination AL and memory direct source.
 
 * As an example, suppose that memByte references a byte in memory.
@@ -92,10 +101,12 @@ mov count, number ; illegal for two memory operands
     * In 32-bit systems, the remaining 4 bytes are the address in memory of memByte.
     
     * In 64-bit systems, the remaining 4 bytes are the displacement from RIP to the address of memByte.
-
+---
 * Consider the instruction mov bl, memByte.    
+![](img/0.png)
+![](img/4.png)
     * ```asm
-          mov bl, memByte
+          mov BL, memByte
       ```
     * Since BL is not the accumulator
         * the opcode is 8A 
@@ -111,7 +122,7 @@ mov count, number ; illegal for two memory operands
          
 * As an example;
     ```asm
-    mov al, [ebx]
+    mov AL, [ebx]
     ```        
     * The accumulator AL is not special except for direct memory addressing, so the opcode will be 8A 
     * The ModR/M byte will consist of Mod=00 for register indirect memory addressing
@@ -119,3 +130,55 @@ mov count, number ; illegal for two memory operands
     * R/M= 011 for EBX
     *  making 00 000 011 or 03
     * In general, for register **indirect mode**, “2+” means “2+0” or just 2.
+---
+![](img/0.png)
+![](img/5.png)
+* Continuing down Figure 4.1, the next row is for **immediate**-to-**memory** moves.    
+    * Each of these instructions has 
+        * opcode C6
+        * a ModR/M byte
+        * additional address bytes (if needed)
+        * finally a byte containing the immediate operand.
+    * For example, smallCounter references a byte in memory and the instruction
+        ```asm
+        mov smallCounter 100
+        ```
+        The assembler will generate 7 (3+4) bytes of object code, 
+        
+        `C6 05 xx xx xx xx 64`
+        
+        where xx xx xx xx represents the address in memory, 64 is the byte-size hex version of 100.
+        *  The ModR/M byte 05 is 00 000 101
+            * Mod=00 
+            * With the Reg field not needed and set to 000.
+            * R/M=101 for direct memory addressing
+    * As another example, consider the code below with the memory destination using register indirect mode.
+        ```asm 
+        mov BYTE PTR [edx], -1 ;C6 02 FF
+        ```    
+       * The opcode is still C6 and the immediate byte (which always comes last) is now FF for −1.  
+        * The second byte is the ModR/M byte with Mod=00 for register indirect, Reg=000 (unused), and R/M=010 for EDX, making 00 000 010 or 02. The object code is therefore C6 02 FF.
+---
+![](img/0.png)
+![](img/6.png)
+* The next two rows of Figure 4.1 are for register-to-memory mov instructions. These are encoded just like the memory-to-register mov instructions, but with different opcodes for different directions. Again, there is a special, slightly more compact version for use when AL is the source and direct memory addressing is used for the destination.   
+---   
+Finally we come to the instructions in Figure 4.1 that work only with a 64-bit processor.
+
+![](img/0.png)
+![](img/7.png)
+
+These are very similar to the instructions above, except that the opcode is preceded by an extra byte, here 41, 44, or 45, shown in italics because **technically it is not part of the opcode**.
+
+ In 64-bit mode, this byte is a **REX prefix**.
+ *  It is used only when the instruction uses one of the 64-bit registers or uses a 64-bit operand.
+ * The first 4 bits of any REX prefix are always 0100 (4<sub>16</sub>).
+ 
+Recall that there are 16 general registers in a 64-bit 80x86 processor, but the Reg and R/M fields of the ModR/M byte each contain 3 bits, only enough to encode eight different registers.
+
+Bit 2 of the REX prefix is combined with the 3 Reg bits in the ModR/M byte, making 4 bits to encode 16 register possibilities. 
+
+Similarly, bit 0 of the REX prefix is appended as the high-order bit of the R/M field to give 16 possibilities there, too. The idea is simple, but the details are messy, so we will not attempt to assemble 64-bit instructions by hand.
+
+One thing to note is that AH, BH, CH, and DH may not be used in combination with R8B–R15B. There are 16 8-bit registers when you count these 12 plus AL, BL, CL, and DL, but the machine code designers chose to make DIL, SIL, BPL, and SPL available for 8-bit operations instead of AH, BH, CH, and DH. We have no occasion to code instructions with DIL, SIL, BPL, or SPL operands.
+
