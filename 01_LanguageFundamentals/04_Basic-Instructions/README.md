@@ -78,7 +78,9 @@ mov count, number ; illegal for two memory operands
             * However, for instructions with two register operands, Mod=11 and the next field (called Reg for “register”) in bits 5, 4, and 3 encodes the destination, 
             * While the final field (called R/M for “register/memory”) in bits 2, 1, and 0 encodes the source register.
     * The 8-bit register encodings used are shown below
+    
     ![](img/2.jpg)
+    
     *   
         ```asm
         mov ch, bl ; 8A EB
