@@ -66,6 +66,7 @@ mov count, number ; illegal for two memory operands
         *  the instruction has the decimal value 10 stored as the byte-size hex value 0A. The opcode code and immediate value complete the 2 bytes of object code promised in the last column of the table.  
         ![](img/1.png)
 ---
+![](img/0.png) 
 ![](img/2.png) 
 * Look at the row of the table where the source and destination both say register 8. This row actually stands for mov instructions with 64 possible operand combinations—any of AL, AH, BL, BH, CL, CH, DL, or DH for the source or for the destination. The opcode for any of these possibilities is always 8A, and the second object code byte identifies the registers.
     
