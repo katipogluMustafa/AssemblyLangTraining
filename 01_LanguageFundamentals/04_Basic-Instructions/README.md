@@ -185,3 +185,234 @@ Similarly, bit 0 of the REX prefix is appended as the high-order bit of the R/M 
 
 One thing to note is that AH, BH, CH, and DH may not be used in combination with R8B–R15B. There are 16 8-bit registers when you count these 12 plus AL, BL, CL, and DL, but the machine code designers chose to make DIL, SIL, BPL, and SPL available for 8-bit operations instead of AH, BH, CH, and DH. We have no occasion to code instructions with DIL, SIL, BPL, or SPL operands.
 
+---
+
+![mov instructions with doubleword destination](img/3.jpg)
+
+Figure 4.4 : mov instructions with doubleword destination
+
+
+
+Each instruction in Figure 4.4 has a doubleword destination. They are very similar to the byte-destination instructions in Figure 4.1.
+
+ The opcodes are different, and the instructions with immediate operands have more bytes of object code because a 4-byte immediate value rather than a 1-byte immediate value is assembled into the instruction.
+ 
+ * First,
+    ```asm
+    mov edx, 1000
+    ```
+    opcode BA and the remaining bytes of the object code will be 000003E8, 1000 as a doubleword integer.
+ 
+ * Next, if dblOp references a doubleword in memory, 
+     ```asm
+     mov eax, dblOp
+     ```
+     will have 5 bytes of object code, the opcode A1 followed by the 32-bit address of dblOp.
+ 
+ * Finally,
+    ```asm
+    mov dblOp, esi
+    ```
+    will have 6 bytes of object code,
+    * The opcode 89
+    * The ModR/M byte, 4 bytes for the address of dblOp. 
+    * The ModR/M byte will have 
+        * mod=00 and R/M=101, the combination always used for direct memory addressing,
+        * reg=110 for ESI, combined to give 00 110 101(35<sub>16</sub>). 
+        
+        ![](img/additionalRegisterEncodingsFor32And16Bit.png)   
+        
+        Figure 4.3
+    * This makes the object code 89 35 xx xx xx xx, where the x’s stand for the address bytes.
+---
+Figure 4.5 : mov instructions with word destination
+
+![mov instructions with word destination](img/4.jpg)
+
+This table is very similar to Figure 4.4, the major difference being a new prefix byte in front of each opcode.
+
+Instructions for 32-bit and 16-bit operands actually have the same opcodes.
+
+A 32-bit 80x86 processor maintains a segment descriptor for each active segment.
+
+* One bit of this descriptor determines whether operands are 16-bit or 32-bit length by default. 
+    
+    *  With the assembly and linking options used in this text, this bit is set to 1 to indicate 32-bit operands. Therefore, the B8 opcode means, for instance, to copy the immediate doubleword following the opcode to EAX, not an immediate word to AX.
+    
+    *  If you code a 16-bit instruction, then the assembler inserts the prefix byte 66 in front of the object code. 
+        * In general, the prefix byte 66 tells the assembler to switch from the default operand size (32 bit or 16 bit) to the alternative size (16 bit or 32 bit) for the single instruction that follows the prefix byte.
+        
+* To make this clearer, suppose you assemble a program containing the following three instructions.    
+    ```asm
+    mov AL, 155
+    mov ax, 155
+    mov eax, 155
+    ```
+    ![](img/8.png)    
+    * Recall that an immediate operand is actually assembled into the object code. 
+        * Each of these instructions contains 155 converted to binary in the appropriate length, 
+            * 9B in the first instruction, 
+            * 009B in the second,
+            * and 0000009B in the third.
+    *  The first instruction has opcode B0, but both of the other instructions have opcode B8. 
+    
+    * The 66 byte shown in the second instruction is the prefix byte that tells the assembler to switch from 32-bit operand size to 16 bit for this instruction.
+    
+A 64-bit 80x86 processor runs in either legacy 32-bit mode, exactly as described previously, or in 64-bit mode.
+
+Different code segments can be in different modes at the same time. In 64-bit mode, the default operand size is still 32 bits.
+
+---
+
+Figure 4.6 : mov instructions with quadword destination     
+![](img/5.jpg)    
+
+Figure 4.6 shows the mov instructions with a quadword destination. Obviously these are only available in 64-bit processors. 
+
+---
+The first 16 rows are not surprising, showing separate instructions for loading a 64-bit immediate operand in a 64-bit register.
+
+![](img/9.png)
+
+Each consists only of a REX prefix, the opcode, and the 8 bytes of the immediate operand. 
+
+---
+![](img/00.png)
+![](img/10.png)
+
+The next two rows show a feature that we have not seen in previous instructions; the immediate value stored in the instruction is a doubleword even though the destination is a quadword. 
+
+Storing a doubleword saves 4 bytes of object code. The immediate doubleword is sign-extended to a quadword as it is stored in the destination, that is, the sign bit (bit 31) in the source is copied to each of bits 32–63 in the destination.
+
+* This ensures that 2’s complement signed numbers are properly represented, but in rare instances could cause a large unsigned number to be incorrectly extended to 64 bits. 
+
+---
+* The REX prefix for each of the last five rows is shown as 4x since there is more than one possible value in each row.
+
+![](img/00.png)
+![](img/11.png)
+
+Particularly with older processors, instructions that access memory are slower than instructions that use data in registers. 
+* A programmer should plan to keep frequently used data in registers when possible.
+
+---
+
+When you first look at all the mov instructions in Figures 4.1, 4.4, 4.5, and 4.6 you may think that you can use them to copy any source value to any destination location. 
+
+However, there are many seemingly logical combinations that are not available. These include:
+
+* A move with both source and destination in memory
+
+* Any move where the operands are not the same size
+
+* A move of several objects
+
+**You may need to do some of these operations**. We describe next how to accomplish some of them.
+ 
+---
+
+ Although there is no mov instruction to copy from a memory source to a memory destination, two moves using an intermediate register can do the job. 
+ 
+ For doubleword-length data in memory referenced by count and number, the illegal instruction
+ ```asm
+ mov count, number   ; illegal for two memory operands
+ ```
+ can be replaced by
+ ```asm
+mov eax, number      
+mov count, eax       ; count := number
+ ```
+ 
+ each using the accumulator EAX and one direct memory operand. 
+ 
+* Some register other than EAX could be used, but each of these instructions using the accumulator requires 5 bytes, while each of the corresponding instructions using some other register takes 6 bytes—EAX is chosen in the interest of compact code.
+
+---
+
+Suppose you have numeric data stored in a doubleword at dblSize, but you want the byte-size version at byteSize. Assuming that the high-order 24 bits are not significant, you can do this with
+
+```asm
+mov EAX, dblSize
+mov byteSize, AL
+```
+
+Going the other way, if an unsigned or positive value is stored at byteSize and we want the doubleword equivalent at dblSize, then
+
+ ```asm
+ mov eax, 0
+ mov al, byteSize
+ mov dblSize, eax
+ ```
+ 
+ does the job.
+ 
+## xchg
+ 
+ Suppose that you have source and destination locations declared as
+ 
+ ```asm
+ source     DWORD 4 DUP(?)
+ dest       DWORD 4 DUP(?)
+ ```
+ 
+ and that you want to copy all four doublewords from the source to the destination.
+ 
+ * One way to do this is with eight instructions
+ ```asm
+ mov eax, source        ; copy the first double word
+ mov dest, eax
+ 
+ mov eax, source+4      ; copy the second double word
+ mov dest+4, eax
+ 
+ mov eax, source+8      ; copy the third double word
+ mov dest+8, eax
+ 
+ mov eax, source+12     ; copy the fourth double word
+ mov dest+12, eax
+ ```
+An address like source+4 refers to the location 4 bytes (one doubleword) after the address of source. 
+
+Since the four doublewords reserved at source are contiguous in memory, source+4 refers to the second doubleword. This code clearly would not be space efficient if you needed to copy 40 or 400 doublewords.In Chapter 5 you will learn how to set up a loop to copy multiple objects.
+
+---
+
+The 80x86 has a very useful `xchg` instruction that exchanges data in one location with data in another location. It accomplishes in a single instruction the operation that often requires three high-level language instructions. 
+
+![](img/12.png)
+
+If value1 is stored in the EAX register and value2 is stored in EBX, we might use ECX for temp and directly implement this design with
+
+```asm
+mov ecx, eax    ; swap value1 and value2
+mov eax, ebx
+mov ebx, ecx
+```
+
+The xchg instruction makes the code shorter and clearer.
+
+```asm
+xchg eax, ebx   ; swap value1 and value2
+```
+
+---
+
+Figure 4.7 lists the various forms of the xchg instruction.
+
+![](img/6.jpg)
+![](img/7.jpg)
+
+* Although the table does not show it, 
+    * The first operand can be a memory operand when the second operand is a register; 
+    * The assembler effectively reverses the order of the operands and uses the form shown in the table.
+* The `xchg` instructions illustrate again that the accumulator sometimes plays a special role in a computer’s architecture.
+    * The instructions that swap another register with the accumulator take 1 byte (plus prefix bytes) instead of 2. 
+
+* Notice again that the word, doubleword, and quadword instructions are the same except for prefix bytes.
+
+* Note that you cannot use an xchg instruction to swap two memory operands.
+    * In general, 80x86 instructions do not allow two memory operands to be encoded.
+
+* Like `mov` instructions, `xchg` instructions do not alter any status flag.    
+    * That is, after execution of an xchg instruction, the bits of the flags register remain the same as before execution of the instruction.
+   
