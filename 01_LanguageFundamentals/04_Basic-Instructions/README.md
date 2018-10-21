@@ -13,8 +13,9 @@ You'll learn
 * Some of the details of how the assembler encodes 80x86 instructions for execution.
 
 ---
+## Copying Data
 
-## mov
+### mov
 Each mov instruction has the form
 ```asm
 mov destination, source
@@ -346,7 +347,7 @@ Going the other way, if an unsigned or positive value is stored at byteSize and 
  
  does the job.
  
-## xchg
+### xchg
  
  Suppose that you have source and destination locations declared as
  
@@ -416,3 +417,5 @@ Figure 4.7 lists the various forms of the xchg instruction.
 * Like `mov` instructions, `xchg` instructions do not alter any status flag.    
     * That is, after execution of an xchg instruction, the bits of the flags register remain the same as before execution of the instruction.
    
+## Integer Addition and Subtraction Instructions
+
