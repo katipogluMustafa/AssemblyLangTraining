@@ -91,7 +91,59 @@ The segment registers have a very special purpose - pointing at accessible block
 * Other general purpose registers cannot form an effective address! 
 * Also, although BX can form an effective address, BH and BL cannot! 
 
+## Special Purpose Registers
 
+* **IP - the instruction pointer**:
+    * Always points to next instruction to be executed
+    * Offset address relative to CS
+
+IP register always works together with CS segment register and it points to currently executing instruction.
+
+
+## Flags Register
+
+* **Flags Register** - determines the current state of the processor.
+
+* Flags Register is modified automatically by CPU after mathematical operations, this allows to determine the type of the result, and to determine conditions to transfer control to other parts of the program.
+Generally you cannot access these registers directly.
+
+![](img/1.gif)
+ 
+* **Carry Flag (CF)** - this flag is set to 1 when there is an unsigned overflow. 
+
+    * For example when you add bytes 255 + 1 (result is not in range 0...255). 
+
+    * When there is no overflow this flag is set to 0.
+    
+* **Parity Flag (PF)** - this flag is set to 1 when there is even number of one bits in result, and to 0 when there is odd number of one bits. 
+
+    * Even if result is a word only 8 low bits are analyzed! 
+
+* **Auxiliary Flag (AF)** - set to 1 when there is an unsigned overflow for low nibble (4 bits).
+    * For Example, 11000+11000 = 110000
+        * Here D4 ,D3, D2, D1, D0 are respectively 1 1 0 0 0.
+        * There is a carry from D3 to D4 in this case.Hence the auxiliary carry flag is set here.
+* **Zero Flag (ZF)** - set to 1 when result is zero. 
+    
+    * For none zero result this flag is set to 0.
+
+* **Sign Flag (SF)** - set to 1 when result is negative. 
+ 
+    * When result is positive it is set to 0. 
+ 
+    * Actually this flag take the value of the most significant bit. 
+
+* **Trap Flag (TF)** - Used for on-chip debugging.
+
+* **Interrupt enable Flag (IF)** - when this flag is set to 1 CPU reacts to interrupts from external devices.
+
+* **Direction Flag (DF)** - this flag is used by some instructions to process data chains,
+    * when this flag is set to 0 - the processing is done forward, 
+    * when this flag is set to 1 the processing is done backward.
+
+* **Overflow Flag (OF)** - set to 1 when there is a signed overflow. 
+    * For example, when you add bytes 100 + 50 (result is not in range -128...127). 
+ 
 
 ## Resources Used
 [Inside the 8086 Central Processor Unit (CPU)](https://eclass.upatras.gr/modules/document/file.php/EE649/8086%20Registers.htm)
