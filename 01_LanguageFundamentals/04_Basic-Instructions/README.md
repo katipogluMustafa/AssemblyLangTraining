@@ -58,7 +58,7 @@ mov count, number ; illegal for two memory operands
 * mov instructions with byte destination
     ![mov instructions with byte destination](img/1.jpg)
     
-    Figure 4.1
+    <sub>Figure 4.1</sub>
     
     * For Instance,
         * ```
@@ -223,7 +223,7 @@ Each instruction in Figure 4.4 has a doubleword destination. They are very simil
         
         ![](img/additionalRegisterEncodingsFor32And16Bit.png)   
         
-        Figure 4.3
+        <sub>Figure 4.3</sub>
     * This makes the object code 89 35 xx xx xx xx, where the x’s stand for the address bytes.
 ---
 Figure 4.5 : mov instructions with word destination
@@ -418,4 +418,168 @@ Figure 4.7 lists the various forms of the xchg instruction.
     * That is, after execution of an xchg instruction, the bits of the flags register remain the same as before execution of the instruction.
    
 ## Integer Addition and Subtraction Instructions
+
+The Intel 80x86 microprocessor has `add` and `sub` instructions to perform addition and subtraction using byte-, word-, doubleword-, or quadword-length operands. 
+
+The operands can be interpreted as unsigned numbers or 2’s complement signed numbers. 
+
+The 80x86 architecture also has `inc` and `dec` instructions to increment (add 1 to) and decrement (subtract 1 from) a single operand, and a `neg` instruction that negates (takes the 2’s complement of) a single operand.
+
+* `add`, `sub`, `inc`, `dec`, and `neg` instructions all update flags in the flags register.
+    * The SF, ZF, OF, PF, and AF flags are set according to the value of the result of the operation
+
+* With both `add` and `sub` instructions, the source (second) operand is unchanged.     
+
+* Addition and subtraction instructions set the sign flag SF to be the same as the high-order bit of the result.
+
+* The carry flag CF records a carry out of the high-order bit with addition, or a borrow with subtraction.
+
+* One reason that 2’s complement form is used to represent signed numbers is that it does not require special hardware for addition or subtraction—the same circuits can be used to add unsigned numbers and 2’s complement numbers. 
+    * The flag values have different interpretations, though, depending on the operand type. 
+    * For instance, if you add two large unsigned numbers and the high-order bit of the result is 1, then SF will be set to 1, but this **does not indicate a negative result**, only a relatively **large sum**.
+    * For an add with **unsigned operands**, **CF=1** would indicate that the result was **too large** to store in the destination, but **with signed operands**, **OF=1** would indicate a **size error**.
+
+#### ADD and SUB
+
+* Figure 4.8 gives information for both addition and subtraction instructions.
+
+    ![Figure 4.8](img/fig_4-8.jpg)
+
+    <sub>Figure 4.8</sub>
+
+* With the 80x86, one memory operand can be encoded.
+
+* With add and sub, as with mov, the accumulator again has special instructions, this time when RAX, EAX, AX, or AL is the destination and the source is immediate. These instructions take one less byte of object code than the corresponding instructions for other registers.    
+
+* The total number of object code bytes for instructions with “+” entries in Figure 4.8 can be calculated once you know the memory operand type. 
+    * In particular, for direct mode, there are 4 additional bytes for the 32-bit address. For register indirect mode, no additional object code is required.
+
+* Notice that an immediate source can be a single byte even when the destination is a word, doubleword, or quadword.
+    * Since immediate operands are often small, this makes the object code more compact. 
+    * Byte-size operands are **sign-extended** to the destination size at run time before the addition or subtraction operation.    
+
+* A similar sign extension takes place in the instructions where the destination is a 64-bit register or a memory quadword and the source is an immediate doubleword. 
+    * Addition and subtraction instructions do not permit 64-bit immediate operands. 
+    * If you need to **add** or **subtract** a **large immediate operand**, you could **use a mov** instruction to put it in a register, and **then use the register as the source** for the add or sub.    
+    
+* It may be surprising that some `add` and `sub` instructions have the same opcode. 
+    * In such cases, the reg field in the ModR/M byte distinguishes between addition and subtraction. 
+    * In fact, these same opcodes are used for additional instructions, most of which are covered later in this text. Figure 4.9 shows how the reg field is encoded for these opcodes and some others.  
+    
+    ![](img/fig_4-9.jpg) 
+    
+    <sub>Figure 4.9: reg field for specified opcodes</sub> 
+
+Suppose a program has dbl at address 000001C8 in the data section and contains the following instructions:
+```asm
+add  ebx, 1000
+
+sub  ebx, 1000
+
+add  dbl, 1000
+
+sub  dbl, 1000
+
+add  ebx, 10
+
+```
+Then the assembly listing will contain
+
+![](img/13.png)    
+
+* Notice the difference between the first and last instructions. 
+    * Each has the register 32 destination operand EBX. 
+    * The assembler could use the 81 opcode for both and encode the immediate operand 10 as 0000000A. 
+    * However, it chooses the 83 opcode for the last instruction in order to generate more compact code. 
+    * The immediate value 0A will be extended to 0000000A when the instruction is executed.
+
+* The immediate operand 1000 will not fit in a byte, so the first four instructions encode it as the doubleword 000003E8.
+    * Look at the ModR/M byte in each of the first two instructions; 
+        * C3 in the add instruction breaks down into 11 000 011,
+        * EB in the sub instruction breaks down into 11 101 011. 
+    * Notice that the reg values of 000 and 101 are what Figure 4.9 shows for `add`and `sub` instructions with opcode 81.
+    
+    * Also recall from Figure 4.3 that EBX is encoded as 011, the value in the r/m field of both instructions. 
+        * The 11 in the mod field indicates an immediate operand.    
+* Now look at the two instructions that have destination dbl. 
+    * You can see this direct memory operand’s address encoded as 000001C8. 
+    * The ModR/M bytes of 05 and 2D for the add and sub instructions, respectively, break down into 00 000 101 and 00 101 101. 
+    * The reg fields again distinguish between addition and subtraction, and the combination of 00 in mod and 101 in r/m means direct memory addressing.
+
+Note:
+* The 11 in the mod field indicates an immediate operand.    
+* The combination of 00 in mod and 101 in r/m means direct memory addressing.
+
+#### INC and DEC
+
+The inc (increment) and dec (decrement) instructions are special-purpose addition and subtraction instructions, always using 1 as an implied source. They have the forms
+```asm
+inc   destination
+```
+
+and
+
+```asm
+dec   destination
+```
+
+Like the add and sub instructions, these instructions are paired with respect to allowable operand types and bytes of object code. 
+
+They are summarized together in Figure 4.10. Prefix bytes are not shown and are not counted in the bytes of object code.
+
+![](img/fig_4-10.jpg)
+
+<sub>Figure 4.10: inc and dec instructions</sub>
+
+* The inc and dec instructions **treat** the value of the destination operand **as an unsigned integer**.
+* They affect the OF, SF, and ZF flags just like addition or subtraction of one, but they **do not change** the carry flag **CF**.
+
+* The `add` instruction requires **3 bytes** of object code (3 bytes instead of 6 because the immediate operand will fit in 1 byte), while the `inc` instruction uses only **1 byte**. 
+
+* In general, a register is the best place to keep a counter, if one can be reserved for this purpose.
+
+#### NEG
+
+* A `neg` instruction negates, or finds the 2’s complement of, its single operand.
+    * When a positive value is negated the result is negative; 
+    * a negative value will become positive. 
+    * Zero remains zero. 
+
+```asm
+neg   destination
+```
+
+![neg instructions](img/fig_4-11.jpg)
+
+<sub>Figure 4.11: `neg` instructions</sub>
+
+```asm
+; author: R.Detmer
+.586
+.MODEL FLAT
+.STACK 4096
+
+.DATA
+x       DWORD 35
+y       DWORD 47
+z       DWORD 26
+
+.CODE
+main PROC
+
+    mov eax, x      ; result := x
+    add eax, y      ; result := x + y
+    mov ebx, z      ; temp := z
+    add ebx, ebx    ; temp := 2 * z
+    sub eax, ebx    ; result := x + y - 2z
+    inc eax         ; result := x + y - 2z + 1
+    neg eax         ; result := -(x + y - 2z + 1)
+    mov eax, 0      ; exit with return code 0
+    ret    
+    
+main ENDP    
+END
+```
+
+<sub>Program to evaluate – (x + y – 2z + 1)</sub>
 
