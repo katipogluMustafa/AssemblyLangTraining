@@ -60,6 +60,37 @@
     * Offset address relative to SS
     * Always points to word (byte at even address)
     * An empty stack will had SP = FFFEh
+    
+## Segment Registers
+
+* CS - points at the segment containing the current program.
+
+* DS - generally points at segment where variables are defined.
+
+* ES - extra segment register, it's up to a coder to define its usage.
+
+* SS - points at the segment containing the stack.
+
+Although it is possible to store any data in the segment registers, this is never a good idea.
+
+The segment registers have a very special purpose - pointing at accessible blocks of memory. 
+
+* Segment registers work together with general purpose register to access any memory value.     
+
+    * For example if we would like to access memory at the physical address 12345h (hexadecimal), 
+        * we should set the DS = 1230h and SI = 0045h.
+    
+    * This is good, since this way we can access much more memory than with a single register that is limited to 16 bit values.
+    
+    * CPU makes a calculation of physical address by multiplying the segment register by 10h and adding general purpose register to it (1230h * 10h + 45h = 12345h):
+
+* The address formed with 2 registers is called an **effective address**. 
+
+* By default BX, SI and DI registers work with DS segment register;
+* BP and SP work with SS segment register.
+* Other general purpose registers cannot form an effective address! 
+* Also, although BX can form an effective address, BH and BL cannot! 
+
 
 
 ## Resources Used
