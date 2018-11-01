@@ -1,4 +1,4 @@
-; Find if given digit is even or odd using Arithmetic Operators 
+; Find if given digit is even or odd using Bitwise Operators
 
 data segment
     even db "The number is even...$"
@@ -27,11 +27,11 @@ start:
     
     
     mov bh, al   
-    mov bl,2
+    mov bl,1
+           
+    and bh,bl
     
-    div bl
-    
-    cmp ah, 0
+    cmp bh, 0
     jnz podd    
    
     ; print even        
