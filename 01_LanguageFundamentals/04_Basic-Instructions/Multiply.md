@@ -98,5 +98,10 @@ imul register, source, immediate
 
     ![](img/imulSyntax3.jpg)
     
-    
+* Generally multiplication instructions are among the slower 80x86 instructions to execute. If, for example, you want to multiply the value in EAX by 2, it is more efficient to use
+   ```asm
+   add   eax, eax   ; double the value
+   ``` 
+   
+* Whether you are programming in assembly language or a high-level language, **avoid using multiplication when a simple addition** will do the job.
 
