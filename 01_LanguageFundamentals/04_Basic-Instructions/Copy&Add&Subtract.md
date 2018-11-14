@@ -582,5 +582,3 @@ END
 ```
 
 <sub>Program to evaluate – (x + y – 2z + 1)</sub>
-
-## Multiplication Instructions
