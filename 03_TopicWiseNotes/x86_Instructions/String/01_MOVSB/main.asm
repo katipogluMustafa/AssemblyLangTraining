@@ -1,36 +1,37 @@
-; add Two 32 bit numbers
+my_ss SEGMENT PARA STACK 'STACK'
 
-mystack	SEGMENT PARA STACK 'STACK'
+	dw 20 dup(?)
 
-	; Define required amount of stack segment here
-	DW 10 DUP(?)
+my_ss ENDS
 
-mystack ENDS
+my_ds SEGMENT PARA 'DATA'
+	eskiyer DB 10,55,7,5,6,1,4
+	yeniyer DB 7 dup(?)
 
-mydata SEGMENT PARA 'DATA'
+my_ds ENDS
 
-mydata ENDS
+my_cs SEGMENT PARA 'CODE'
+	ASSUME CS:my_cs, DS:my_ds, SS:my_ss
 
-mycode SEGMENT PARA 'CODE'
+MAIN PROC FAR
+	push ds
+	xor ax,ax
+	push ax
 
-	ASSUME CS:mycode, DS:mydata, SS:mystack
-	
-MAIN	PROC FAR
-		
-		; For returning
-		push ds
-		xor ax,ax
-		push ax
-	
-		; For defining data segment
-		mov ax, mydata
-		mov ds, ax
-		
-		; Define your program specific code
-		
+	mov ax, my_ds
+	mov ds, ax
 
-		RETF
+	mov ax, my_ds
+	mov es, ax
 
-MAIN 	ENDP
-mycode  ENDS
-	    END MAIN
+	LEA SI, eskiyer
+	LEA DI, yeniyer
+	mov cx, 7
+	CLD
+	REP MOVSB
+
+
+RETF
+MAIN  ENDP
+my_cs ENDS
+	  END MAIN
