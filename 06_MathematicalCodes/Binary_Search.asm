@@ -1,4 +1,4 @@
-my_ss    	SEGMENT PARA STACK 'yigin'
+my_ss       SEGMENT PARA STACK 'yigin'
             dw 20 dup(?)
 my_ss       ENDS
 my_ds       SEGMENT PARA 'veri'
@@ -35,13 +35,13 @@ whilee:     PUSH AX
 			PUSH AX
 			PUSH DX
 		    ADD AX,DX   ;AX te max ve min indis toplami var 
-			SHR AX,1      ;toplam indisi yarýya boluyoruz, ax te mid indis olustu
+			SHR AX,1      ;toplam indisi yarÃ½ya boluyoruz, ax te mid indis olustu
             MOV BX,AX   ;orta indis degerini dizi indis degerine atiyoruz
 			POP DX
 			POP AX
 			CMP CL,dizi[BX] ;orta indisteki dizi degeriyle aranan sayi karsilastiriliyor			
 			JE bulcik
-			JA mindegis; asagý koda inerse maxý degisecegiz
+			JA mindegis; asagÃ½ koda inerse maxÃ½ degisecegiz
 			MOV AX,BX   ;orta indisi maksimum yaptim
 			JMP son
 mindegis:   MOV DX,BX   ;orta indisi minimum yaptim
