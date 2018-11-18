@@ -1,5 +1,5 @@
-;carpimda dx:ax carpimin dusuk anlamlý wordu ax te
-;yuksek anlamlý wordu dx te olusur
+;carpimda dx:ax carpimin dusuk anlamlÃ½ wordu ax te
+;yuksek anlamli wordu dx te olusur
 ortaksg     SEGMENT PARA 'kod'
             ORG 100H
 			ASSUME ss:ortaksg,ds:ortaksg,cs:ortaksg
