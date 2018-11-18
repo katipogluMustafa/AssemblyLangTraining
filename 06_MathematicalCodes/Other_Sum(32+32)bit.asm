@@ -1,6 +1,6 @@
 ortaksg SEGMENT PARA 'kod'
         ORG 100h
-		ASSUME ss:ortaksg,ds:ortaksg,cs:ortaksg
+	ASSUME ss:ortaksg,ds:ortaksg,cs:ortaksg
 ANA     PROC NEAR			
    
 		MOV AX, WORD PTR [sayi1]   ;8 clock cycle
