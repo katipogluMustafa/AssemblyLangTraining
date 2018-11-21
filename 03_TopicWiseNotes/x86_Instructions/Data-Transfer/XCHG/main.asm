@@ -1,11 +1,11 @@
 ; -------------------------------------------------------------------------
 ;
-; 	*** LEA : Load Effective Address***
+; 	*** XCHG : Exchange***
+; - Girdi olan 2 operand'ın değiş tokuş yapmasını sağlar.
 ; 
-; - istenen bellek alanın göreli konumu register'da oluşur.
-; - SI,DI ve BX harici register kullanılamaz.
-;
-; src <-- Address of Dest
+; - xchg reg, reg
+; - xchg reg, mem
+; - xchg mem, reg
 ;
 ; -------------------------------------------------------------------------
 mystack	SEGMENT PARA STACK 'STACK'
@@ -13,7 +13,7 @@ mystack	SEGMENT PARA STACK 'STACK'
 mystack ENDS
 
 mydata SEGMENT PARA 'DATA'
-	myVar	dw	0111011001110101B
+	myVar	dw	1453h
 mydata ENDS
 
 mycode SEGMENT PARA 'CODE'
@@ -33,21 +33,13 @@ MAIN	PROC FAR
 		
 		; Custom Instructions Starts
 		
-		LEA SI, myVar
+		XOR AX, AX					; AX = 0
+		xchg AX, myVar				; AX = 1453 myVar = 0
 		
-		xor ax,ax		; AX = 0
+		xor BX,BX
+		xchg AX,BX					; BX = 1453 AX = 0
 		
-		mov AL, [SI]	; AL = 01110101B
-		mov AH, [SI + 1]; AH = 01110110B
-											; AX = 7675h
-		mov BYTE PTR [SI + 0], 0FFh
-		mov BYTE PTR [SI + 1], 0DDh
-		
-		mov dx, [SI]						; DX = 0DDFFh
-		
-		mov WORD PTR [SI], 0FFFFh
-		
-		mov cx, [SI]						; CX = 0FFFFh		
+		xchg BX, myVar				; BX = 0	myVar = 1453
 		
 		
 		; Custom Instructions Ends
