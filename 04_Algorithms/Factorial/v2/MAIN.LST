@@ -1,0 +1,91 @@
+Microsoft (R) Macro Assembler Version 5.10                  11/25/18 21:49:5
+                                                             Page     1-1
+
+
+				; Calculate n factorial
+				
+ 0000				mystack	SEGMENT PARA STACK 'STACK'
+ 0000  000A[				DW 10 DUP(?)
+	   ????			
+			 ]	
+				
+ 0014				mystack ENDS
+				
+ 0000				mydata SEGMENT PARA 'DATA'
+ 0000  05				n db 5
+ 0001  00000000			sonuc dd 0
+ 0005				mydata ENDS
+				
+ 0000				mycode SEGMENT PARA 'CODE'
+				
+					ASSUME CS:mycode, DS:mydata, SS:mystack
+					
+ 0000				MAIN	PROC FAR
+						
+						; For returning
+ 0000  1E					push ds
+ 0001  33 C0					xor ax,ax
+ 0003  50					push ax
+					
+						; For defining data segment
+ 0004  B8 ---- R				mov ax, mydata
+ 0007  8E D8					mov ds, ax
+						
+						; Custom Instructions Starts
+ 0009  33 D2					xor dx,dx
+						
+ 000B  B8 0001					mov ax, 1
+						
+ 000E  33 C9					xor cx, cx
+ 0010  8A 0E 0000 R				mov cl, n
+ 0014					l1:
+ 0014  F7 E1				    mul cx
+ 0016  E2 FC					loop l1
+						
+ 0018  A3 0001 R				mov WORD PTR [sonuc + 0], ax
+ 001B  89 16 0003 R				mov WORD PTR [sonuc + 2], dx
+						
+						; Custom Instructions Ends
+						
+ 001F  CB					RETF
+				
+ 0020				MAIN 	ENDP
+ 0020				mycode  ENDS
+					    END MAIN
+Microsoft (R) Macro Assembler Version 5.10                  11/25/18 21:49:5
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+MYCODE . . . . . . . . . . . . .  	0020	PARA	NONE	'CODE'
+MYDATA . . . . . . . . . . . . .  	0005	PARA	NONE	'DATA'
+MYSTACK  . . . . . . . . . . . .  	0014	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+L1 . . . . . . . . . . . . . . .  	L NEAR	0014	MYCODE
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	MYCODE	Length = 0020
+
+N  . . . . . . . . . . . . . . .  	L BYTE	0000	MYDATA
+
+SONUC  . . . . . . . . . . . . .  	L DWORD	0001	MYDATA
+
+@CPU . . . . . . . . . . . . . .  	TEXT  0101h		
+@FILENAME  . . . . . . . . . . .  	TEXT  main		
+@VERSION . . . . . . . . . . . .  	TEXT  510		
+
+
+     47 Source  Lines
+     47 Total   Lines
+     15 Symbols
+
+  47860 + 463495 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
