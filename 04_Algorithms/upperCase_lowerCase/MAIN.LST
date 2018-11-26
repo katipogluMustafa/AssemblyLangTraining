@@ -1,0 +1,128 @@
+Microsoft (R) Macro Assembler Version 5.10                  11/25/18 24:01:1
+                                                             Page     1-1
+
+
+				; Calculate Number of Lower or Upper case chara
+				cter in a string
+				
+ 0000				mystack	SEGMENT PARA STACK 'STACK'
+ 0000  000A[				DW 10 DUP(?)
+	   ????			
+			 ]	
+				
+ 0014				mystack ENDS
+				
+ 0000				mydata SEGMENT PARA 'DATA'
+				
+ 0000  4D 75 73 74 61 66		myStr  db 'Mustafa Katipoglu$'
+       61 20 4B 61 74 69	
+       70 6F 67 6C 75 24	
+ 0012  0012				n	   dw 18
+ 0014  0000			lowerCount dw 0
+ 0016  0000			upperCount dw 0
+ 0018  0000			otherCount dw 0
+				
+ 001A				mydata ENDS
+				
+ 0000				mycode SEGMENT PARA 'CODE'
+				
+					ASSUME CS:mycode, DS:mydata, SS:mystack
+					
+ 0000				MAIN	PROC FAR
+						
+						; For returning
+ 0000  1E					push ds
+ 0001  33 C0					xor ax,ax
+ 0003  50					push ax
+					
+						; For defining data segment
+ 0004  B8 ---- R				mov ax, mydata
+ 0007  8E D8					mov ds, ax
+						
+						; Custom Instructions Starts
+ 0009  33 C0					xor ax,ax
+ 000B  8B 0E 0012 R				mov cx, n
+ 000F  8D 36 0000 R				lea SI, myStr
+ 0013					l1:
+ 0013  8A 04			        mov al, [SI]
+				
+ 0015  3C 61					cmp al, 'a'
+ 0017  7C 0B					JNGE else1
+ 0019  3C 7A					cmp al, 'z'
+ 001B  7F 07					JNLE else1
+						
+ 001D  FF 06 0014 R				INC WORD PTR lowerCount
+ 0021  EB 14 90					JMP endofloop
+						
+ 0024				  else1:
+ 0024  3C 41					cmp al, 'A'
+Microsoft (R) Macro Assembler Version 5.10                  11/25/18 24:01:1
+                                                             Page     1-2
+
+
+ 0026  7C 0B					JNGE else2
+ 0028  3C 5A					cmp al, 'Z'
+ 002A  7F 07					JNLE else2
+						
+ 002C  FF 06 0016 R				INC WORD PTR upperCount
+ 0030  EB 05 90					JMP endofloop
+						
+ 0033				  else2:
+						
+ 0033  FF 06 0018 R				INC WORD PTR otherCount
+ 0037				endofloop:	
+ 0037  46					INC SI
+ 0038  E2 D9					loop l1
+						
+						; Custom Instructions Ends
+						
+ 003A  CB					RETF
+				
+ 003B				MAIN 	ENDP
+ 003B				mycode  ENDS
+					    END MAIN
+Microsoft (R) Macro Assembler Version 5.10                  11/25/18 24:01:1
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+MYCODE . . . . . . . . . . . . .  	003B	PARA	NONE	'CODE'
+MYDATA . . . . . . . . . . . . .  	001A	PARA	NONE	'DATA'
+MYSTACK  . . . . . . . . . . . .  	0014	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ELSE1  . . . . . . . . . . . . .  	L NEAR	0024	MYCODE
+ELSE2  . . . . . . . . . . . . .  	L NEAR	0033	MYCODE
+ENDOFLOOP  . . . . . . . . . . .  	L NEAR	0037	MYCODE
+
+L1 . . . . . . . . . . . . . . .  	L NEAR	0013	MYCODE
+LOWERCOUNT . . . . . . . . . . .  	L WORD	0014	MYDATA
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	MYCODE	Length = 003B
+MYSTR  . . . . . . . . . . . . .  	L BYTE	0000	MYDATA
+
+N  . . . . . . . . . . . . . . .  	L WORD	0012	MYDATA
+
+OTHERCOUNT . . . . . . . . . . .  	L WORD	0018	MYDATA
+
+UPPERCOUNT . . . . . . . . . . .  	L WORD	0016	MYDATA
+
+@CPU . . . . . . . . . . . . . .  	TEXT  0101h		
+@FILENAME  . . . . . . . . . . .  	TEXT  main		
+@VERSION . . . . . . . . . . . .  	TEXT  510		
+
+
+     69 Source  Lines
+     69 Total   Lines
+     21 Symbols
+
+  47974 + 461333 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
