@@ -1,0 +1,32 @@
+		EXTRN TOPLAMA:FAR
+STACKSG SEGMENT PARA STACK 'stack'
+	dw 10 dup(?)
+STACKSG ENDS
+
+DATASG SEGMENT PARA 'data'
+
+SAYI1	DB 12h
+SAYI2	DB 78h
+SONUC	DW 0h
+
+DATASG ENDS
+
+CODESG SEGMENT PARA 'code'
+	 ASSUME CS:CODESG, DS:DATASG, SS:STACKSG
+MAIN PROC FAR
+		push ds
+		xor ax,ax
+		push ax
+
+		mov ax, DATASG
+		mov DS, ax
+
+		mov bh, SAYI1
+		mov bl, SAYI2
+		CALL TOPLAMA
+		mov SONUC, AX
+
+	    RETF
+MAIN    ENDP
+CODESG  ENDS
+	    END MAIN
