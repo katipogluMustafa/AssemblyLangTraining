@@ -1,0 +1,39 @@
+STACKSG SEGMENT PARA STACK 'stack'
+	dw 10 dup(?)
+STACKSG ENDS
+
+DATASG SEGMENT PARA 'data'
+
+SAYI	DW	2
+UST		DW  10
+SONUC	DW	0
+
+DATASG ENDS
+
+CODESG SEGMENT PARA 'code'
+	 ASSUME CS:CODESG, DS:DATASG, SS:STACKSG
+MAIN PROC FAR
+		push ds
+		xor ax,ax
+		push ax
+
+		mov ax, DATASG
+		mov DS, ax
+
+		mov cx, UST
+		mov bx, SAYI
+		CALL USTAL
+		MOV SONUC, ax
+
+	    RETF
+MAIN    ENDP
+
+USTAL	PROC NEAR
+		mov ax, 1
+L1:		mul bx
+		loop L1
+		RET
+USTAL 	ENDP
+
+CODESG  ENDS
+	    END MAIN
