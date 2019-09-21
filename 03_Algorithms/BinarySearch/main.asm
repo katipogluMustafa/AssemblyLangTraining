@@ -1,4 +1,4 @@
-; Binary Search
+; Binary Search Algorithm
 ; This code is organised according to com type standards.
 
 MYSEG	SEGMENT PARA 'CODE'
